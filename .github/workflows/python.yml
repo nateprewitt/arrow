@@ -62,6 +62,7 @@ jobs:
       ARROW_GCS: OFF
       ARROW_HDFS: ON
       ARROW_JEMALLOC: ON
+      ARROW_MIMALLOC: OFF  # DEBUG: Test if mimalloc is causing the hang
       ARROW_ORC: ON
       ARROW_PARQUET: ON
       PARQUET_REQUIRE_ENCRYPTION: ON
@@ -150,22 +151,7 @@ jobs:
           export PYTHONDEVMODE=1
           export ARROW_DEBUG_MEMORY_POOL=trap
           
-          # DEBUG: Run only the remaining ~9% of tests that never ran:
-          # 1. The 3 tests after test_nested_chunking_valid in test_pandas.py
-          # 2. All test files after test_pandas.py alphabetically
-          pytest -r s -v --pyargs \
-            pyarrow.tests.test_pandas::test_bytes_column_name_to_pandas \
-            pyarrow.tests.test_pandas::test_is_data_frame_race_condition \
-            pyarrow.tests.test_pandas::test_json_unserializable_pd_df_attrs \
-            pyarrow.tests.test_scalars \
-            pyarrow.tests.test_schema \
-            pyarrow.tests.test_sparse_tensor \
-            pyarrow.tests.test_strategies \
-            pyarrow.tests.test_substrait \
-            pyarrow.tests.test_table \
-            pyarrow.tests.test_tensor \
-            pyarrow.tests.test_types \
-            pyarrow.tests.test_udf \
-            pyarrow.tests.test_util
+          # DEBUG: Run full test_pandas.py with ARROW_MIMALLOC=OFF to verify root cause
+          pytest -r s -v --pyargs pyarrow.tests.test_pandas
 
   # DEBUG: Windows job disabled for testing - see original python.yml for full content

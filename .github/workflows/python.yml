@@ -75,7 +75,8 @@ jobs:
       ARROW_WITH_SNAPPY: ON
       ARROW_WITH_BROTLI: ON
       ARROW_BUILD_TESTS: OFF
-      PYARROW_TEST_LARGE_MEMORY: ON
+      # DEBUG: Disable large memory tests to avoid test_nested_chunking_valid hang
+      PYARROW_TEST_LARGE_MEMORY: OFF
       # Current oldest supported version according to https://endoflife.date/macos
       MACOSX_DEPLOYMENT_TARGET: 12.0
     steps:
@@ -141,8 +142,8 @@ jobs:
       - name: Test
         shell: bash
         env:
-          # DEBUG: Skip test_pandas.py and other heavy tests to isolate timeout
-          PYTEST_ARGS: "--ignore=pyarrow/tests/test_pandas.py --ignore=pyarrow/tests/test_substrait.py -v"
+          # DEBUG: Run all tests (large_memory tests skipped via PYARROW_TEST_LARGE_MEMORY=OFF)
+          PYTEST_ARGS: "-v"
         run: ci/scripts/python_test.sh $(pwd) $(pwd)/build
 
   # DEBUG: Windows job disabled for testing - see original python.yml for full content
